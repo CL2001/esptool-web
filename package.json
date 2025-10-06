@@ -1,0 +1,19 @@
+{
+  "name": "esptool-web",
+  "version": "1.0.0",
+  "description": "Steps took to init project mkdir esptool-web cd esptool-web npm init -y npm install esptool-js npm install typescript vite --save-dev npx tsc --init",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esptool-js": "^0.5.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9"
+  }
+}
