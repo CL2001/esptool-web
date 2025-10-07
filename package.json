@@ -2,15 +2,19 @@
   "name": "esptool-web",
   "version": "1.0.0",
   "description": "Steps took to init project mkdir esptool-web cd esptool-web npm init -y npm install esptool-js npm install typescript vite --save-dev npx tsc --init",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "esptool-js": "^0.5.7"
+    "esptool-js": "^0.5.7",
+    "web-serial-polyfill": "^1.0.15"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
