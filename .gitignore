@@ -5,3 +5,8 @@ docs
 esptool-js-*.tgz
 .vscode/settings.json
 .parcel-cache
+firmware/.pio/
+firmware/.vscode/.browse.c_cpp.db*
+firmware/.vscode/c_cpp_properties.json
+firmware/.vscode/launch.json
+firmware/.vscode/ipch
