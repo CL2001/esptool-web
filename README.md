@@ -23,27 +23,31 @@ Compile using the following command
 pio run --project-dir ./firmware
 ```
 
-
-
 # Running the code
 ## First time set up
 ```bash
 npm install
 npm run build
 ```
-```bash
-cd my-flash
-npm install
-```
 
 ## Run website
 ```bash
+cd my-flash
+npm install
 npm run dev
 ```
 
 Then open `http://localhost:1234` in a Chrome browser.
 
+Steps:
+1. Select connect
+2. Select files from esptool-web/firmware/.pio/build/esp32s3-wroom-1-n16r8
+3. Insert bootloader.bin at 0x00000
+4. Insert partitions.bin at 0x08000
+5. Insert firmware.bin at 0x10000
 
 
+
+# Credits
 All credits goes to the esptool-web project.
 I have simply modified their example project and placed it into my-flash

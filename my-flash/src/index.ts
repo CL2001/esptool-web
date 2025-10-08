@@ -44,6 +44,14 @@ consoleStopButton.style.display = "none";
 resetButton.style.display = "none";
 filesDiv.style.display = "none";
 
+// Set fixed baud rates and hide the selects
+baudrates.value = "921600";
+consoleBaudrates.value = "115200";
+baudrates.style.display = "none";
+consoleBaudrates.style.display = "none";
+lblBaudrate.style.display = "none";
+lblConsoleBaudrate.style.display = "none";
+
 /**
  * File reader handler
  */
@@ -72,6 +80,8 @@ const espLoaderTerminal = {
 // Initialize fixed 3 files
 function initializeFileRows() {
   const addresses = ["0x0000", "0x8000", "0x10000"];
+  const labels = ["Add bootloader.bin", "Add partitions.bin", "Add firmware.bin"];
+
   addresses.forEach((addr, index) => {
     const row = table.insertRow(index + 1);
 
@@ -96,13 +106,18 @@ function initializeFileRows() {
     cell3.style.display = "none";
     cell3.innerHTML = `<progress value="0" max="100"></progress>`;
 
-    // Column 4 - Empty (no remove button)
+    // Column 4 - Empty (action cell)
     const cell4 = row.insertCell(3);
     cell4.classList.add("action-cell");
+
+    // Column 5 - Label text (new column on the right)
+    const cell5 = row.insertCell(4);
+    cell5.textContent = labels[index];
+    cell5.style.fontWeight = "bold";
+    cell5.style.color = "#007bff";
   });
 }
 
-// Call to initialize files
 initializeFileRows();
 
 connectButton.onclick = async () => {
