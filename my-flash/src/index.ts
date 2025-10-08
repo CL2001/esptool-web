@@ -7,8 +7,7 @@ const resetButton = document.getElementById("resetButton") as HTMLButtonElement;
 const consoleStartButton = document.getElementById("consoleStartButton") as HTMLButtonElement;
 const consoleStopButton = document.getElementById("consoleStopButton") as HTMLButtonElement;
 const eraseButton = document.getElementById("eraseButton") as HTMLButtonElement;
-const addFileButton = document.getElementById("addFile") as HTMLButtonElement;
-const programButton = document.getElementById("programButton");
+const programButton = document.getElementById("programButton") as HTMLButtonElement;
 const filesDiv = document.getElementById("files");
 const terminal = document.getElementById("terminal");
 const programDiv = document.getElementById("program");
@@ -22,16 +21,13 @@ const alertDiv = document.getElementById("alertDiv");
 
 const debugLogging = document.getElementById("debugLogging") as HTMLInputElement;
 
-// This is a frontend example of Esptool-JS using local bundle file
-// To optimize use a CDN hosted version like
-// https://unpkg.com/esptool-js@0.5.0/bundle.js
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "../../lib";
 import { serial } from "web-serial-polyfill";
 
 const serialLib = !navigator.serial && navigator.usb ? serial : navigator.serial;
 
-declare let Terminal; // Terminal is imported in HTML script
-declare let CryptoJS; // CryptoJS is imported in HTML script
+declare let Terminal;
+declare let CryptoJS;
 
 const term = new Terminal({ cols: 120, rows: 40 });
 term.open(terminal);
@@ -49,26 +45,15 @@ resetButton.style.display = "none";
 filesDiv.style.display = "none";
 
 /**
- * The built in Event object.
- * @external Event
- * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Event}
- */
-
-/**
- * File reader handler to read given local file.
- * @param {Event} evt File Select event
+ * File reader handler
  */
 function handleFileSelect(evt) {
   const file = evt.target.files[0];
-
   if (!file) return;
-
   const reader = new FileReader();
-
   reader.onload = (ev: ProgressEvent<FileReader>) => {
     evt.target.data = ev.target.result;
   };
-
   reader.readAsBinaryString(file);
 }
 
@@ -83,6 +68,42 @@ const espLoaderTerminal = {
     term.write(data);
   },
 };
+
+// Initialize fixed 3 files
+function initializeFileRows() {
+  const addresses = ["0x0000", "0x8000", "0x10000"];
+  addresses.forEach((addr, index) => {
+    const row = table.insertRow(index + 1);
+
+    // Column 1 - Offset
+    const cell1 = row.insertCell(0);
+    const element1 = document.createElement("input");
+    element1.type = "text";
+    element1.value = addr;
+    element1.disabled = true;
+    cell1.appendChild(element1);
+
+    // Column 2 - File selector
+    const cell2 = row.insertCell(1);
+    const element2 = document.createElement("input");
+    element2.type = "file";
+    element2.addEventListener("change", handleFileSelect, false);
+    cell2.appendChild(element2);
+
+    // Column 3 - Progress
+    const cell3 = row.insertCell(2);
+    cell3.classList.add("progress-cell");
+    cell3.style.display = "none";
+    cell3.innerHTML = `<progress value="0" max="100"></progress>`;
+
+    // Column 4 - Empty (no remove button)
+    const cell4 = row.insertCell(3);
+    cell4.classList.add("action-cell");
+  });
+}
+
+// Call to initialize files
+initializeFileRows();
 
 connectButton.onclick = async () => {
   try {
@@ -101,8 +122,6 @@ connectButton.onclick = async () => {
     traceButton.style.display = "initial";
     chip = await esploader.main();
 
-    // Temporarily broken
-    // await esploader.flashId();
     console.log("Settings done for :" + chip);
     lblBaudrate.style.display = "none";
     lblConnTo.innerHTML = "Connected to device: " + chip;
@@ -120,9 +139,7 @@ connectButton.onclick = async () => {
 };
 
 traceButton.onclick = async () => {
-  if (transport) {
-    transport.returnTrace();
-  }
+  if (transport) transport.returnTrace();
 };
 
 resetButton.onclick = async () => {
@@ -145,68 +162,6 @@ eraseButton.onclick = async () => {
   }
 };
 
-addFileButton.onclick = () => {
-  const rowCount = table.rows.length;
-  const row = table.insertRow(rowCount);
-
-  //Column 1 - Offset
-  const cell1 = row.insertCell(0);
-  const element1 = document.createElement("input");
-  element1.type = "text";
-  element1.id = "offset" + rowCount;
-  element1.value = "0x1000";
-  cell1.appendChild(element1);
-
-  // Column 2 - File selector
-  const cell2 = row.insertCell(1);
-  const element2 = document.createElement("input");
-  element2.type = "file";
-  element2.id = "selectFile" + rowCount;
-  element2.name = "selected_File" + rowCount;
-  element2.addEventListener("change", handleFileSelect, false);
-  cell2.appendChild(element2);
-
-  // Column 3  - Progress
-  const cell3 = row.insertCell(2);
-  cell3.classList.add("progress-cell");
-  cell3.style.display = "none";
-  cell3.innerHTML = `<progress value="0" max="100"></progress>`;
-
-  // Column 4  - Remove File
-  const cell4 = row.insertCell(3);
-  cell4.classList.add("action-cell");
-  if (rowCount > 1) {
-    const element4 = document.createElement("input");
-    element4.type = "button";
-    const btnName = "button" + rowCount;
-    element4.name = btnName;
-    element4.setAttribute("class", "btn");
-    element4.setAttribute("value", "Remove"); // or element1.value = "button";
-    element4.onclick = function () {
-      removeRow(row);
-    };
-    cell4.appendChild(element4);
-  }
-};
-
-/**
- * The built in HTMLTableRowElement object.
- * @external HTMLTableRowElement
- * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableRowElement}
- */
-
-/**
- * Remove file row from HTML Table
- * @param {HTMLTableRowElement} row Table row element to remove
- */
-function removeRow(row: HTMLTableRowElement) {
-  const rowIndex = Array.from(table.rows).indexOf(row);
-  table.deleteRow(rowIndex);
-}
-
-/**
- * Clean devices variables on chip disconnect. Remove stale references if any.
- */
 function cleanUp() {
   device = null;
   transport = null;
@@ -251,10 +206,7 @@ consoleStartButton.onclick = async () => {
   while (true && !isConsoleClosed) {
     const readLoop = transport.rawRead();
     const { value, done } = await readLoop.next();
-
-    if (done || !value) {
-      break;
-    }
+    if (done || !value) break;
     term.write(value);
   }
   console.log("quitting console");
@@ -277,34 +229,12 @@ consoleStopButton.onclick = async () => {
   cleanUp();
 };
 
-/**
- * Validate the provided files images and offset to see if they're valid.
- * @returns {string} Program input validation result
- */
 function validateProgramInputs() {
-  const offsetArr = [];
   const rowCount = table.rows.length;
-  let row;
-  let offset = 0;
-  let fileData = null;
-
-  // check for mandatory fields
   for (let index = 1; index < rowCount; index++) {
-    row = table.rows[index];
-
-    //offset fields checks
-    const offSetObj = row.cells[0].childNodes[0];
-    offset = parseInt(offSetObj.value);
-
-    // Non-numeric or blank offset
-    if (Number.isNaN(offset)) return "Offset field in row " + index + " is not a valid address!";
-    // Repeated offset used
-    else if (offsetArr.includes(offset)) return "Offset field in row " + index + " is already in use!";
-    else offsetArr.push(offset);
-
-    const fileObj = row.cells[1].childNodes[0];
-    fileData = fileObj.data;
-    if (fileData == null) return "No file selected for row " + index + "!";
+    const row = table.rows[index];
+    const fileObj = row.cells[1].childNodes[0] as any;
+    if (!fileObj.data) return `No file selected for row ${index}!`;
   }
   return "success";
 }
@@ -319,7 +249,6 @@ programButton.onclick = async () => {
     return;
   }
 
-  // Hide error message
   alertDiv.style.display = "none";
 
   const fileArray = [];
@@ -331,7 +260,7 @@ programButton.onclick = async () => {
     const offSetObj = row.cells[0].childNodes[0] as HTMLInputElement;
     const offset = parseInt(offSetObj.value);
 
-    const fileObj = row.cells[1].childNodes[0] as ChildNode & { data: string };
+    const fileObj = row.cells[1].childNodes[0] as any;
     const progressBar = row.cells[2].childNodes[0];
 
     progressBar.textContent = "0";
@@ -359,12 +288,9 @@ programButton.onclick = async () => {
     console.error(e);
     term.writeln(`Error: ${e.message}`);
   } finally {
-    // Hide progress bars and show erase buttons
     for (let index = 1; index < table.rows.length; index++) {
       table.rows[index].cells[2].style.display = "none";
       table.rows[index].cells[3].style.display = "initial";
     }
   }
 };
-
-addFileButton.onclick(this);
