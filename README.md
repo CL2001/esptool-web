@@ -45,6 +45,8 @@ Steps:
 3. Insert bootloader.bin at 0x00000
 4. Insert partitions.bin at 0x08000
 5. Insert firmware.bin at 0x10000
+6. Press program
+7. Unplug and replug the Esp32
 
 
 

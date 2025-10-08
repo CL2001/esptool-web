@@ -307,5 +307,6 @@ programButton.onclick = async () => {
       table.rows[index].cells[2].style.display = "none";
       table.rows[index].cells[3].style.display = "initial";
     }
+    term.writeln("\nFlashing completed! Please unplug and replug your ESP device.");
   }
 };
